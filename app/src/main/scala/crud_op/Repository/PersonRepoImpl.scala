@@ -29,6 +29,7 @@ class PersonRepoImpl extends PersonRepo {
       case e:Exception => e.printStackTrace()
 
     }
+    connection.close()
     "Created Successful"
 
 
@@ -42,16 +43,20 @@ class PersonRepoImpl extends PersonRepo {
           |INSERT INTO personTable values(?,?,?);
           |""".stripMargin
       val statement: PreparedStatement = connection.prepareStatement(query)
-      statement.setInt(1, person.Id)
-      statement.setString(2, person.Name)
-      statement.setInt(3, person.Age)
-      statement.executeUpdate()
-//      connection.close()
+        statement.setInt(1, person.Id)
+        statement.setString(2, person.Name)
+        statement.setInt(3, person.Age)
+        statement.executeUpdate()
+
+
+//     connection.close()
     }
     catch {
       case e:Exception => e.printStackTrace()
     }
-    "Data Inserted Successfully!!!!!!!!!!!!!!!"
+
+      connection.close()
+      "Data Inserted Successfully!!!!!!!!!!!!!!!"
 
   }
 
@@ -69,8 +74,8 @@ class PersonRepoImpl extends PersonRepo {
         val name = resultset.getString("NAME")
         val age = resultset.getInt("AGE")
         println(s"$id, $name, $age")
+         connection.close()
       }
-//      connection.close()
 
   }
     catch {
@@ -87,7 +92,7 @@ class PersonRepoImpl extends PersonRepo {
       statement.setInt(3, person.Id)
       statement.executeUpdate()
       println(s"ROW WITH ${person.Id} IS UPDATED")
-//      connection.close()
+      connection.close()
     }
     catch {
       case e:Exception => e.printStackTrace()
@@ -105,7 +110,7 @@ class PersonRepoImpl extends PersonRepo {
       statement.executeUpdate()
 
       println(s"ROW WITH ID $id IS DELETED")
-//      connection.close()
+      connection.close()
 
     }
     catch {
@@ -126,6 +131,7 @@ class PersonRepoImpl extends PersonRepo {
          val age = resultSet.getInt("AGE")
          println(s"ID is $id and NAME is $name and AGE is $age")
       }
+      connection.close()
     }
     catch {
       case e:Exception => e.printStackTrace()
