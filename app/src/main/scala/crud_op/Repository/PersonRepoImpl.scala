@@ -1,7 +1,10 @@
 package crud_op.Repository
 import crud_op.Entity.Person
 
-import java.sql.{Connection, DriverManager, PreparedStatement, Statement, ResultSet}
+
+import java.io.File
+import java.sql.{Connection, DriverManager, PreparedStatement, ResultSet, Statement}
+import scala.io.Source
 
 class PersonRepoImpl extends PersonRepo {
 
@@ -29,33 +32,55 @@ class PersonRepoImpl extends PersonRepo {
       case e:Exception => e.printStackTrace()
 
     }
-    connection.close()
     "Created Successful"
 
 
   }
 
 
-  override def insertPerson(person: Person): String = {
+  override def insertPerson(filepath: String): String = {
     try {
+      val startTime = System.currentTimeMillis()
+      val bufferedSource = Source.fromFile(new File(filepath))
+      val lines = bufferedSource.getLines().drop(1)
+      val person = lines.map { line =>
+        val fields = line.split(",").map(_.trim)
+        Person(fields(0).toInt, fields(1), fields(2).toInt)
+      }.toList
+      connection.setAutoCommit(false)
       val query: String =
         """
-          |INSERT INTO personTable values(?,?,?);
+          |INSERT INTO persontable values(?,?,?);
           |""".stripMargin
       val statement: PreparedStatement = connection.prepareStatement(query)
-        statement.setInt(1, person.Id)
-        statement.setString(2, person.Name)
-        statement.setInt(3, person.Age)
-        statement.executeUpdate()
+      val batchSize = 1000
+      var count = 0
+      person.foreach { persons =>
+        statement.setInt(1, persons.Id)
+        statement.setString(2, persons.Name)
+        statement.setInt(3, persons.Age)
+        statement.addBatch()
+        count+=1
+      }
+      if (count % batchSize == 0) {
+        statement.executeBatch()
+      }
+      statement.executeBatch()
+      bufferedSource.close()
+      connection.commit()
 
+      val endTime = System.currentTimeMillis()
+      val totalTimeSeconds = (endTime - startTime) / 1000.0
+      println(s"Total insertion time: ${totalTimeSeconds} seconds")
 
-//     connection.close()
+//        connection.close()
     }
     catch {
       case e:Exception => e.printStackTrace()
+        connection.rollback()
     }
 
-      connection.close()
+//      connection.close()
       "Data Inserted Successfully!!!!!!!!!!!!!!!"
 
   }
@@ -74,7 +99,7 @@ class PersonRepoImpl extends PersonRepo {
         val name = resultset.getString("NAME")
         val age = resultset.getInt("AGE")
         println(s"$id, $name, $age")
-         connection.close()
+//         connection.close()
       }
 
   }
@@ -92,7 +117,7 @@ class PersonRepoImpl extends PersonRepo {
       statement.setInt(3, person.Id)
       statement.executeUpdate()
       println(s"ROW WITH ${person.Id} IS UPDATED")
-      connection.close()
+//      connection.close()
     }
     catch {
       case e:Exception => e.printStackTrace()
@@ -110,7 +135,7 @@ class PersonRepoImpl extends PersonRepo {
       statement.executeUpdate()
 
       println(s"ROW WITH ID $id IS DELETED")
-      connection.close()
+//      connection.close()
 
     }
     catch {
@@ -131,11 +156,10 @@ class PersonRepoImpl extends PersonRepo {
          val age = resultSet.getInt("AGE")
          println(s"ID is $id and NAME is $name and AGE is $age")
       }
-      connection.close()
+//      connection.close()
     }
     catch {
       case e:Exception => e.printStackTrace()
     }
-
   }
 }

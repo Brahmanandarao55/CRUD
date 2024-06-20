@@ -5,9 +5,9 @@ class PersonServiceImpl extends PersonService {
 
   val obj = new PersonRepoImpl
 
-  override def insert(person: Person): Unit = {
+  override def insert(person: String): Unit = {
     obj.createPerson()
-    obj.insertPerson(person:Person)
+    obj.insertPerson(person:String)
 
   }
 

@@ -1,7 +1,6 @@
 ext {
     scalaMajorVersion="2.12"
     scalaMinorVersion="6"
-//    scalaMinorVersion="15"
     scalaVersion = scalaMajorVersion + "." + scalaMinorVersion
     gradleScoverageVersion="4.0.1"
     gradleNexusPlugin="2.3.1"

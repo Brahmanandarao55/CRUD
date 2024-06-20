@@ -24,6 +24,7 @@ class PersonSteps extends ScalaDsl with EN with Matchers with MockitoSugar {
   Given("""a Person Repository"""){ () =>
     when(personRepo.createPerson()).thenReturn("Created Successful")
   }
+
   Given("""a person with ID {int}, name {string}, and age {int}"""){
     (id:Int,name:String,age:Int)=>
       personService.insert(Person(id,name,age))

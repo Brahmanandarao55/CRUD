@@ -6,7 +6,7 @@ trait PersonRepo {
 
   def jdbcConnection():Connection
   def createPerson():String
-  def insertPerson(person: Person): String
+  def insertPerson(person: String): String
   def getPerson(id:Option[Int]):Unit
   def updatePerson(person: Person):Unit
   def deletePerson(id:Option[Int]):Unit
